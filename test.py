@@ -92,9 +92,24 @@ O = (0,0)
 P = (1, 1)
 |OP| = distance(O, P) = sqrt(2)
 |OP’| = 1 / sqrt(2)
-P’ = P * |OP’| = (1 / sqrt(2), 1 / sqrt(2))
+|OP'| / |OP| = (1 / sqrt(2)) / sqrt(2) = 0.5
+P’ = P * |OP'| / |OP| = P * 0.5 = (0.5, 0.5)
+
+https://www.symbolab.com/solver/distance-calculator/
+http://www.geometer.org/mathcircles/inversion.pdf
 """
-print(invert([[0.5, 1]], 0))
+# This code below will calculate the position for the inverse point but only for
+# points on the line x=y
+p1 = [0.25, 0.25]
+p1_dist = distance([0, 0], p1)
+dist_ratio = (1 / p1_dist) / p1_dist
+p2 = [p1[0] * dist_ratio, p1[1] * dist_ratio]
+p2_dist = distance([0, 0], p2)
+print(p1)
+print(p1_dist)
+print(p2)
+print(p2_dist)
+print((p1_dist * p2_dist) == 1)
 quit()
 
 plt.plot(xline, yline)
