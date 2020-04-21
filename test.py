@@ -73,12 +73,17 @@ def calc_distance(p1, p2):
     return total_dist
 
 
+def calc_inverse_dist(point, radius=1):
+    """
+    Calculate the distance for the inverse point from a circle inversion of given radius
+    """
+    original_distance = calc_distance([0, 0], point)
+    inverse_distance = (radius**2) / original_distance
+    return inverse_distance
+
+
 # Check that distance of anywhere on the unit circle is 1
 # print(calc_distance([0, 0], [x[33], y[33]]))
-
-# Create a 2D vertical line at x=1
-xline = np.linspace(1, 1, 101)
-yline = np.linspace(-10, 10, 101)
 
 
 def calc_slope(point):
@@ -88,26 +93,51 @@ def calc_slope(point):
     return point[1] / point[0]
 
 
-def circl_invert(coords):
+def calc_point_inverse(point):
     """
     Do a 2D circle inversion of a set of coordinates on the unit circle:
     - Calculate the distance from that point to the origin of the circle
     - Find the slope of the line which the point and the origin lie on
     - Find the angle between that line and the x-axis
-    - Solve the triangle using hypotenuse length and the two angles to get the inverse coordinates
+    - Use inverse hypotenuse length and angle to get coordinates of inverse point
     """
-    inverse = [[], []]
-    for point in coords:
-        new_x = 1 / point[0]
-        new_y = 1 / point[1]
-        # Still need to adjust x and y based on the ray they should be on
-        inverse[0].append(new_x)
-        inverse[1].append(new_y)
+    point_slope = calc_slope(point)
+    a, b, c, A, B, C = solve(a=1, b=point_slope, C=(math.pi/2))
+    theta = deepcopy(B)
+    inverse_distance = calc_inverse_dist(point)
+    a, b, c, A, B, C = solve(c=inverse_distance, B=theta, C=(math.pi/2))
+    inverse_point = [round(a), b]
+    return inverse_point
+
+
+# Currently only works for positive values b/c of triangle solver.
+# Next step: create custom triangle solver for the case in each quadrant
+# print(calc_point_inverse([0.1, 0.1]))
+# quit()
+
+
+def circle_invert(geo_object):
+    """
+    Run point inverse on all points in the object
+    Object is just a list of points (which are themselves lists of coordinates)
+    """
+    inverse = []
+    for point in geo_object:
+        inverse.append(calc_point_inverse(point))
     return inverse
 
 
-a,b,c,A,B,C = solve(a=3,b=4,C=(math.pi/2))
-print(a,b,c,A,B,C)
+# print(circle_invert([[0.5, 0.5], [0.25, 0.25], [0.125, 0.125]]))
+# quit()
+
+# Create a 2D vertical line at x=1
+xline = np.linspace(1, 1, 1001)
+yline = np.linspace(0.001, 20, 1001)
+line = [[xline[i], yline[i]] for i in range(len(xline))]
+print(circle_invert(line))
+x,y = zip(*circle_invert(line))
+plt.plot(x,y)
+plt.show()
 quit()
 
 """
